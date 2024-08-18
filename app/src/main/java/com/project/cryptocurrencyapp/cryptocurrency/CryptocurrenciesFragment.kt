@@ -30,7 +30,7 @@ class CryptocurrenciesFragment : Fragment() {
 
     private val cryptocurrenciesViewModel: CryptocurrenciesViewModel by viewModel()
 
-    private lateinit var cryptocurrencyAdapter : CryptocurrencyAdapter
+    private lateinit var cryptocurrencyAdapter: CryptocurrencyAdapter
 
 
     override fun onCreateView(
@@ -43,12 +43,11 @@ class CryptocurrenciesFragment : Fragment() {
             false
         )
 
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.cryptocurrency_list)
+        (activity as AppCompatActivity).supportActionBar?.title =
+            getString(R.string.cryptocurrency_list)
 
         return binding.root
     }
-
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +57,7 @@ class CryptocurrenciesFragment : Fragment() {
         initRecyclerView()
         initObservers()
         initListeners()
-        cryptocurrenciesViewModel.getCryptocurrencies("usd")
+        getCryptocurrencyListUSD()
     }
 
     private fun initObservers() = with(cryptocurrenciesViewModel) {
@@ -85,21 +84,21 @@ class CryptocurrenciesFragment : Fragment() {
         }
     }
 
-    private fun showError() = with(binding){
+    private fun showError() = with(binding) {
         errorScreen.root.visibility = View.VISIBLE
         rvCryptocurrency.visibility = View.GONE
     }
 
-    private fun hideError() = with(binding){
+    private fun hideError() = with(binding) {
         errorScreen.root.visibility = View.GONE
     }
 
-    private fun showLoading() = with(binding){
+    private fun showLoading() = with(binding) {
         loadingScreen.root.visibility = View.VISIBLE
         rvCryptocurrency.visibility = View.GONE
     }
 
-    private fun hideLoading() = with(binding){
+    private fun hideLoading() = with(binding) {
         loadingScreen.root.visibility = View.GONE
         rvCryptocurrency.visibility = View.VISIBLE
     }
@@ -110,15 +109,40 @@ class CryptocurrenciesFragment : Fragment() {
         rvCryptocurrency.adapter = cryptocurrencyAdapter
     }
 
-    private fun initListeners() = with(binding){
+    private fun initListeners() = with(binding) {
         errorScreen.btnTryAgain.setOnClickListener {
-            cryptocurrenciesViewModel.getCryptocurrencies("usd")
+            getCryptocurrencyListUSD()
+        }
+
+        chipRub.setOnClickListener {
+            getCryptocurrencyListRUB()
+        }
+
+        chipUsd.setOnClickListener {
+            getCryptocurrencyListUSD()
         }
     }
 
+    private fun getCryptocurrencyListUSD() {
+        cryptocurrencyAdapter.setTypeViewPrice("usd")
+        cryptocurrenciesViewModel.getCryptocurrencies("usd")
+        switchCurrency(isUsd = true)
+    }
+
+    private fun getCryptocurrencyListRUB() {
+        cryptocurrencyAdapter.setTypeViewPrice("rub")
+        cryptocurrenciesViewModel.getCryptocurrencies("rub")
+        switchCurrency(isUsd = false)
+    }
+
+    private fun switchCurrency(isUsd: Boolean) = with(binding) {
+        chipUsd.isChecked = isUsd
+        chipRub.isChecked = !isUsd
+    }
+
     private fun initToolbar() {
-        val menuHost : MenuHost = requireActivity()
-        menuHost.addMenuProvider(object :MenuProvider{
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_cryptocurrency_list, menu)
             }
