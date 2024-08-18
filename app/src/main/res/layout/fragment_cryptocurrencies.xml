@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".cryptocurrency.CryptocurrenciesFragment">
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCryptocurrency"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_cryptocurrency_view"/>
+
+    <include android:id="@+id/errorScreen"
+        layout="@layout/error_screen_view"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        />
+
+
+    <include android:id="@+id/loadingScreen"
+        layout="@layout/loading_screen_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+
+
+</FrameLayout>
