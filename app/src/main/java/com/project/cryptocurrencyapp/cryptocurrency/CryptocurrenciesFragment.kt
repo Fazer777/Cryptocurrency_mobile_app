@@ -1,5 +1,6 @@
 package com.project.cryptocurrencyapp.cryptocurrency
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,13 +15,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.project.cryptocurrencyapp.R
 import com.project.cryptocurrencyapp.cryptocurrency.adapters.CryptocurrencyAdapter
 import com.project.cryptocurrencyapp.cryptocurrency.viewmodels.CryptocurrenciesViewModel
 import com.project.cryptocurrencyapp.databinding.FragmentCryptocurrenciesBinding
+import com.project.cryptocurrencyapp.utils.network.IConnectivityObserver
+import com.project.cryptocurrencyapp.utils.network.NetworkConnectivityObserver
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.math.log10
 
 
 class CryptocurrenciesFragment : Fragment() {
@@ -31,6 +39,10 @@ class CryptocurrenciesFragment : Fragment() {
     private val cryptocurrenciesViewModel: CryptocurrenciesViewModel by viewModel()
 
     private lateinit var cryptocurrencyAdapter: CryptocurrencyAdapter
+
+    private lateinit var connectivityObserver: NetworkConnectivityObserver
+
+    private val TAG = "AAA"
 
 
     override fun onCreateView(
@@ -53,11 +65,40 @@ class CryptocurrenciesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initToolbar()
-        cryptocurrencyAdapter = CryptocurrencyAdapter(requireContext())
+        connectivityObserver = NetworkConnectivityObserver(requireContext())
         initRecyclerView()
         initObservers()
         initListeners()
-        getCryptocurrencyListUSD()
+
+        val state = cryptocurrenciesViewModel.cryptocurrencyState.value
+        if (state is CryptocurrenciesViewModel.CryptocurrencyUiState.Success){
+            cryptocurrencyAdapter.setData(state.data!!)
+        }
+        else{
+            checkInitialNetworkStatus()
+        }
+    }
+
+    private fun checkInitialNetworkStatus() {
+        Log.d(TAG, "checkInitialNetworkStatus")
+        val initialStatus = connectivityObserver.getCurrentStatus()
+        when (initialStatus) {
+            IConnectivityObserver.Status.Available -> {
+                getCryptocurrencyListUSD()
+            }
+
+            IConnectivityObserver.Status.Unavailable -> {
+                hideLoading()
+                showError()
+                Toast.makeText(
+                    requireContext(),
+                    "Internet connection is unavailable",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            else -> {}
+        }
     }
 
     private fun initObservers() = with(cryptocurrenciesViewModel) {
@@ -66,22 +107,51 @@ class CryptocurrenciesFragment : Fragment() {
                 CryptocurrenciesViewModel.CryptocurrencyUiState.Loading -> {
                     hideError()
                     showLoading()
+                    Log.d(TAG, "initObservers: Loading")
                 }
 
                 is CryptocurrenciesViewModel.CryptocurrencyUiState.Success -> {
                     hideError()
                     hideLoading()
                     cryptocurrencyAdapter.setData(newData = state.data!!)
+                    Log.d(TAG, "initObservers: Success")
                 }
 
                 is CryptocurrenciesViewModel.CryptocurrencyUiState.Error -> {
                     hideLoading()
                     showError()
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_LONG).show()
-                    Log.d("AAA", state.error)
+                    Log.d(TAG, "initObservers: Error")
                 }
             }
         }
+
+        connectivityObserver.observe().onEach { status ->
+            when (status) {
+                IConnectivityObserver.Status.Available -> {
+                    Log.d(TAG, "initObservers: Available")
+                }
+
+                IConnectivityObserver.Status.Unavailable -> {
+                    hideLoading()
+                    showError()
+                    Log.d(TAG, "initObservers: Unavailable")
+                }
+
+                IConnectivityObserver.Status.Losing -> {
+                    hideLoading()
+                    showError()
+                    Log.d(TAG, "initObservers: Losing")
+                }
+
+                IConnectivityObserver.Status.Lost -> {
+                    hideLoading()
+                    showError()
+                    Log.d(TAG, "initObservers: Lost")
+                }
+            }
+
+        }.launchIn(viewModelScope)
     }
 
     private fun showError() = with(binding) {
@@ -104,6 +174,7 @@ class CryptocurrenciesFragment : Fragment() {
     }
 
     private fun initRecyclerView() = with(binding) {
+        cryptocurrencyAdapter = CryptocurrencyAdapter(requireContext())
         rvCryptocurrency.layoutManager =
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         rvCryptocurrency.adapter = cryptocurrencyAdapter
@@ -111,7 +182,7 @@ class CryptocurrenciesFragment : Fragment() {
 
     private fun initListeners() = with(binding) {
         errorScreen.btnTryAgain.setOnClickListener {
-            getCryptocurrencyListUSD()
+            checkInitialNetworkStatus()
         }
 
         chipRub.setOnClickListener {
@@ -153,5 +224,4 @@ class CryptocurrenciesFragment : Fragment() {
 
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
-
 }
