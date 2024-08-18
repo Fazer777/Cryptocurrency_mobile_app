@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="5dp"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/ivImageCryptocurrency"
+            android:layout_width="50dp"
+            android:layout_height="50sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src = "@mipmap/ic_launcher_round"
+            android:layout_margin="5dp"
+            android:contentDescription="TODO" />
+
+        <TextView
+            android:id="@+id/tvNameCryptocurrency"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivImageCryptocurrency"
+            app:layout_constraintEnd_toStartOf="@id/tvCurrPriceCryptocurrency"
+            app:layout_constraintBottom_toTopOf="@id/tvSymbolCryptocurrency"
+            android:textColor="@color/dark_grеy"
+            android:textSize="22sp"
+            android:layout_marginStart="5dp"
+            tools:text = "Bitcoin"/>
+
+        <TextView
+            android:id="@+id/tvSymbolCryptocurrency"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvNameCryptocurrency"
+            app:layout_constraintStart_toEndOf="@id/ivImageCryptocurrency"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvPriceChangePercentage"
+            android:textColor="@color/grеy"
+            android:textSize="20sp"
+            android:layout_marginStart="5dp"
+            tools:text = "BTC"/>
+
+        <TextView
+            android:id="@+id/tvCurrPriceCryptocurrency"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/tvNameCryptocurrency"
+            app:layout_constraintStart_toEndOf="@id/tvNameCryptocurrency"
+            app:layout_constraintBottom_toTopOf="@id/tvPriceChangePercentage"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/dark_grеy"
+            android:textSize="22sp"
+            android:layout_marginEnd="5dp"
+            android:gravity="end"
+            tools:text = "\u0024 28,560.95"/>
+
+        <TextView
+            android:id="@+id/tvPriceChangePercentage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/tvSymbolCryptocurrency"
+            app:layout_constraintStart_toEndOf="@id/tvSymbolCryptocurrency"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="18sp"
+            android:gravity="end"
+            android:layout_marginEnd="5dp"
+            tools:text = "+4.05%"
+            tools:textColor="@color/dark_cyan"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
