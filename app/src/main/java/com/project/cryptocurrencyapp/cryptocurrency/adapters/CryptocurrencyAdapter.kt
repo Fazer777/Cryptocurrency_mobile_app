@@ -87,8 +87,8 @@ class CryptocurrencyAdapter(
         }
     }
 
-    private fun setTypeViewPrice(typePrice: String) {
-        typeViewPrice = TypeViewPrice.valueOf(typePrice)
+    fun setTypeViewPrice(typePrice: String) {
+        typeViewPrice = TypeViewPrice.fromString(typePrice) ?: TypeViewPrice.USD
     }
 
     // TODO("NEED Changes to Diff utils")
